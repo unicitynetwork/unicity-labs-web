@@ -193,6 +193,7 @@
         font-size: theme(fontSize.5xl);
         font-weight: 800;
         color: var(--title-text-color);
+        @apply tracking-wider;
     }
 
     h2 {
@@ -200,6 +201,7 @@
         font-size: theme(fontSize.4xl);
         font-weight: 800;
         color: var(--title-text-color);
+        @apply tracking-wider;
     }
 }
 
