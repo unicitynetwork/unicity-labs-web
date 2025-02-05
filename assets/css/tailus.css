@@ -6,7 +6,10 @@
 
 @font-face {
     font-family: 'Brigends';
-    src: url('/fonts/brigends.otf') format('opentype');
+    src: 
+        url('/fonts/brigends.otf') format('opentype'),
+        url('/fonts/brigends.ttf') format('truetype'),
+        url('/fonts/brigends.woff2') format('woff2');
     font-weight: 800;
     font-style: bold;
 }
