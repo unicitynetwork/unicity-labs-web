@@ -53,6 +53,10 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         return start + (end - start) * t;
     }
 
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
     let previousSegment = -1;
 
     function getLocalProgress(progress) {
@@ -69,7 +73,10 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         // Normalize local progress within the current segment
         const segmentStart = breakpoints[segmentIndex];
         const segmentEnd = breakpoints[segmentIndex + 1];
-        const localProgress = (progress - segmentStart) / (segmentEnd - segmentStart);
+        let localProgress = (progress - segmentStart) / (segmentEnd - segmentStart);
+
+        // Apply easing
+        localProgress = easeInOutCubic(localProgress);
 
         return { localProgress, startShape: shapeSequence[segmentIndex], endShape: shapeSequence[segmentIndex + 1], segmentIndex };
     }
