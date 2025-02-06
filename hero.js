@@ -15,55 +15,41 @@ function getLineDataFromDocument(doc) {
     }));
 }
 
-// **Define Foreground & Background SVG Sequences**
+// **Define SVG Sequence here**
 const svgSequence = ["1.svg", "1.svg", "2.svg", "2.svg", "3.svg"];
-const bgSvgSequence = ["1_mesh.svg", "2_mesh.svg", "3_mesh.svg"];
+const uniqueSvgFiles = [...new Set(svgSequence)];
 
-const uniqueSvgFiles = [...new Set([...svgSequence, ...bgSvgSequence])];
-
-// Load unique SVGs
+// Load only unique SVGs
 Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
+
     const uniqueShapes = uniqueSvgFiles.reduce((acc, name, index) => {
         acc[name] = getLineDataFromDocument(svgDocs[index]);
         return acc;
     }, {});
 
     const shapeSequence = svgSequence.map(name => uniqueShapes[name]);
-    const bgShapeSequence = bgSvgSequence.map(name => uniqueShapes[name]); // Background sequence
 
-    if (!shapeSequence.length || !bgShapeSequence.length) {
+    if (shapeSequence.length === 0 || shapeSequence[0].length === 0) {
         console.error("No valid line data found in SVGs.");
         return;
     }
 
-    // **Scroll position breakpoints**
-    const animationBreakpoints = [1/96, 1/3, 2/3]; // Foreground line animations
-    const breakpoints = [0, 1/96, 31/96, 33/96, 64/96]; // Foreground morphing
-    const bgBreakpoints = [0, 1/2, 1]; // Background morphing
+    // **Scroll position breakpoints for animations**
+    const animationBreakpoints = [1/48, 1/3, 2/3]; 
 
-    // **Setup Foreground SVG**
+    // ** Breakpoints for morphing **
+    const breakpoints = [0, 1/48, 15/48, 17/48, 32/48]; 
+
     const visibleSVG = document.getElementById("hero-svg");
     const visibleLines = [];
 
+    // ** Assuming all shapes have the same number of lines! **
     shapeSequence[0].forEach(() => {
         const lineElem = document.createElementNS("http://www.w3.org/2000/svg", "line");
         lineElem.setAttribute("stroke", "#999");
         lineElem.setAttribute("stroke-width", 2);
         visibleSVG.appendChild(lineElem);
         visibleLines.push(lineElem);
-    });
-
-    // **Setup Background SVG (Lines, Not Rects!)**
-    const backgroundSVG = document.getElementById("background-svg");
-    backgroundSVG.innerHTML = "";
-    const bgLines = [];
-
-    bgShapeSequence[0].forEach(() => {
-        const bgLineElem = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        bgLineElem.setAttribute("stroke", "#777");
-        bgLineElem.setAttribute("stroke-width", 2);
-        backgroundSVG.appendChild(bgLineElem);
-        bgLines.push(bgLineElem);
     });
 
     function lerp(start, end, t) {
@@ -77,7 +63,7 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
     let previousSegment = -1;
     let lastTriggeredBreakpoint = null;
 
-    function getLocalProgress(progress, breakpoints, shapeSequence) {
+    function getLocalProgress(progress) {
         let segmentIndex = 0;
 
         while (segmentIndex < breakpoints.length - 1 && progress >= breakpoints[segmentIndex + 1]) {
@@ -97,21 +83,25 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         return { localProgress, startShape: shapeSequence[segmentIndex], endShape: shapeSequence[segmentIndex + 1], segmentIndex };
     }
 
+    // **Trigger line animations at scroll breakpoints**
     function triggerLineAnimation(progress) {
         for (let bp of animationBreakpoints) {
             if (Math.abs(progress - bp) < 0.02 && lastTriggeredBreakpoint !== bp) { 
                 lastTriggeredBreakpoint = bp; 
     
                 const totalLines = visibleLines.length;
+                // % of total lines animated
                 const numAnimated = Math.ceil(totalLines * 0.25); 
                 const selectedLines = visibleLines.sort(() => 0.5 - Math.random()).slice(0, numAnimated); 
     
                 selectedLines.forEach((line, i) => {
-                    const delay = Math.random(); 
+                    const delay = Math.random(); // 0-1 sec delay, random
     
+                    // Force reflow before applying animation
                     line.style.animation = "none";
                     line.offsetHeight; 
     
+                    // Animation duration per line
                     line.style.animation = `lineGlow 0.2s ${delay}s ease-in-out`;
     
                     setTimeout(() => { 
@@ -121,9 +111,10 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
             }
         }
     }
+    
 
     function updateLines(progress) {
-        const { localProgress, startShape, endShape, segmentIndex } = getLocalProgress(progress, breakpoints, shapeSequence);
+        const { localProgress, startShape, endShape, segmentIndex } = getLocalProgress(progress);
 
         triggerLineAnimation(progress);
 
@@ -158,28 +149,10 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         previousSegment = segmentIndex;
     }
 
-    function updateBackground(progress) {
-        const { localProgress, startShape, endShape } = getLocalProgress(progress, bgBreakpoints, bgShapeSequence);
-
-        for (let i = 0; i < bgLines.length; i++) {
-            const s = startShape[i];
-            const e = endShape[i];
-            const x1 = lerp(s.x1, e.x1, localProgress);
-            const y1 = lerp(s.y1, e.y1, localProgress);
-            const x2 = lerp(s.x2, e.x2, localProgress);
-            const y2 = lerp(s.y2, e.y2, localProgress);
-
-            bgLines[i].setAttribute("x1", x1);
-            bgLines[i].setAttribute("y1", y1);
-            bgLines[i].setAttribute("x2", x2);
-            bgLines[i].setAttribute("y2", y2);
-        }
-    }
-
+    // Animation
     function update() {
         const progress = Math.min(1, window.scrollY / (3 * window.innerHeight));
         updateLines(progress);
-        updateBackground(progress);
         requestAnimationFrame(update);
     }
 
