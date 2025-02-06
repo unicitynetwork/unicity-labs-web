@@ -887,3 +887,9 @@
 line {
     transition: stroke 0.2s ease-in-out;
 }
+
+/* background fade */
+.background-svg {
+    opacity: 0.1;
+    transition: opacity 1s ease-in-out; /* Smooth fade transition */
+}
