@@ -877,3 +877,13 @@
         @apply bg-gray-500/5 [--title-text-color:theme(colors.white)]
     }
 }
+
+/* hero SVG */
+@keyframes lineGlow {
+    0% { stroke: white; }
+    100% { stroke: #999; }
+}
+
+line {
+    transition: stroke 0.2s ease-in-out;
+}

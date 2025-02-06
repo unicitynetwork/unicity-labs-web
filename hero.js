@@ -6,7 +6,6 @@ async function loadSVG(url) {
     return parser.parseFromString(svgText, "image/svg+xml");
 }
 
-// Extract line data
 function getLineDataFromDocument(doc) {
     return Array.from(doc.querySelectorAll("line")).map(line => ({
         x1: parseFloat(line.getAttribute("x1")),
@@ -16,12 +15,13 @@ function getLineDataFromDocument(doc) {
     }));
 }
 
-// **Define SVG Sequence here
+// **Define SVG Sequence here**
 const svgSequence = ["1.svg", "1.svg", "2.svg", "2.svg", "3.svg"];
-const uniqueSvgFiles = [...new Set(svgSequence)]; // Extract unique SVGs
+const uniqueSvgFiles = [...new Set(svgSequence)];
 
 // Load only unique SVGs
 Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
+
     const uniqueShapes = uniqueSvgFiles.reduce((acc, name, index) => {
         acc[name] = getLineDataFromDocument(svgDocs[index]);
         return acc;
@@ -34,13 +34,16 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         return;
     }
 
-    // ** Define breakpoints for morphing. Adjust to time transitions.
-    const breakpoints = [0, 1/24, 7/24, 9/24, 16/24]; 
+    // **Scroll position breakpoints for animations**
+    const animationBreakpoints = [1/48, 1/3, 2/3]; 
+
+    // ** Breakpoints for morphing **
+    const breakpoints = [0, 1/48, 15/48, 17/48, 32/48]; 
 
     const visibleSVG = document.getElementById("hero-svg");
     const visibleLines = [];
 
-    // ** Assuming ll shapes have the same number of lines!
+    // ** Assuming all shapes have the same number of lines! **
     shapeSequence[0].forEach(() => {
         const lineElem = document.createElementNS("http://www.w3.org/2000/svg", "line");
         lineElem.setAttribute("stroke", "#999");
@@ -58,6 +61,7 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
     }
 
     let previousSegment = -1;
+    let lastTriggeredBreakpoint = null;
 
     function getLocalProgress(progress) {
         let segmentIndex = 0;
@@ -70,22 +74,50 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
             return { localProgress: 1, startShape: shapeSequence[shapeSequence.length - 1], endShape: shapeSequence[shapeSequence.length - 1], segmentIndex };
         }
 
-        // Normalize local progress within the current segment
         const segmentStart = breakpoints[segmentIndex];
         const segmentEnd = breakpoints[segmentIndex + 1];
         let localProgress = (progress - segmentStart) / (segmentEnd - segmentStart);
 
-        // Apply easing
         localProgress = easeInOutCubic(localProgress);
 
         return { localProgress, startShape: shapeSequence[segmentIndex], endShape: shapeSequence[segmentIndex + 1], segmentIndex };
     }
 
+    // **Trigger line animations at scroll breakpoints**
+    function triggerLineAnimation(progress) {
+        for (let bp of animationBreakpoints) {
+            if (Math.abs(progress - bp) < 0.02 && lastTriggeredBreakpoint !== bp) { 
+                lastTriggeredBreakpoint = bp; 
+    
+                const totalLines = visibleLines.length;
+                // % of total lines animated
+                const numAnimated = Math.ceil(totalLines * 0.25); 
+                const selectedLines = visibleLines.sort(() => 0.5 - Math.random()).slice(0, numAnimated); 
+    
+                selectedLines.forEach((line, i) => {
+                    const delay = Math.random(); // 0-1 sec delay, random
+    
+                    // Force reflow before applying animation
+                    line.style.animation = "none";
+                    line.offsetHeight; 
+    
+                    // Animation duration per line
+                    line.style.animation = `lineGlow 0.2s ${delay}s ease-in-out`;
+    
+                    setTimeout(() => { 
+                        line.style.animation = "none"; 
+                    }, 1200);
+                });
+            }
+        }
+    }
+    
 
     function updateLines(progress) {
         const { localProgress, startShape, endShape, segmentIndex } = getLocalProgress(progress);
 
-        // Skip updates if the same shape is used
+        triggerLineAnimation(progress);
+
         if (startShape === endShape) {
             if (previousSegment !== segmentIndex) {
                 for (let i = 0; i < visibleLines.length; i++) {
@@ -124,7 +156,6 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         requestAnimationFrame(update);
     }
 
-    // Start the animation
     requestAnimationFrame(update);
 }).catch(err => {
     console.error("Error loading SVGs:", err);
