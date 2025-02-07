@@ -35,7 +35,7 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
     }
 
     // **Scroll position breakpoints for animations**
-    const animationBreakpoints = [1/48, 1/3, 2/3]; 
+    const animationBreakpoints = [2/3]; 
 
     // ** Breakpoints for morphing **
     const breakpoints = [0, 1/48, 15/48, 17/48, 32/48]; 
@@ -91,18 +91,18 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
     
                 const totalLines = visibleLines.length;
                 // % of total lines animated
-                const numAnimated = Math.ceil(totalLines * 0.25); 
+                const numAnimated = Math.ceil(totalLines * 0.5); 
                 const selectedLines = visibleLines.sort(() => 0.5 - Math.random()).slice(0, numAnimated); 
     
                 selectedLines.forEach((line, i) => {
-                    const delay = Math.random(); // 0-1 sec delay, random
+                    const delay = Math.random() * 2; // 0-2 sec delay, random
     
                     // Force reflow before applying animation
                     line.style.animation = "none";
                     line.offsetHeight; 
     
                     // Animation duration per line
-                    line.style.animation = `lineGlow 0.2s ${delay}s ease-in-out`;
+                    line.style.animation = `lineGlow 0.6s ${delay}s ease-in-out`;
     
                     setTimeout(() => { 
                         line.style.animation = "none"; 

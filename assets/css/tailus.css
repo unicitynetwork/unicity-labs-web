@@ -883,7 +883,3 @@
     0% { stroke: #fff; }
     100% { stroke: #999; }
 }
-
-line {
-    transition: stroke 0.6s ease-in-out;
-}
