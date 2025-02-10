@@ -19,8 +19,9 @@ $ npm run preview
 
 ### hero.js
 
-[hero.js](publid/hero.js) controls the animated scroll behind the hero section.
-The hero section can be configured to the height needed, and the animation breakpoints then controlled accordingly.
+[hero.js](public/hero.js) controls the animated scroll behind the hero section.
+The hero section can be configured to the height needed and the animation breakpoints then controlled accordingly.
+E.g, with a vh of 400: ending a transition after scrolling 1 screen height, there should be a breakpoint at 1/4 etc.
 ```javascript
 const progress = Math.min(1, window.scrollY / (4 * window.innerHeight));
 ```
