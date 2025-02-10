@@ -16,7 +16,7 @@ function getLineDataFromDocument(doc) {
 }
 
 // **Define SVG Sequence here**
-const svgSequence = ["1.svg", "1.svg", "2.svg", "2.svg", "3.svg"];
+const svgSequence = ["1.svg", "1.svg", "2.svg", "2.svg", "3.svg", "4.svg"];
 const uniqueSvgFiles = [...new Set(svgSequence)];
 
 // Load only unique SVGs
@@ -35,10 +35,10 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
     }
 
     // **Scroll position breakpoints for animations**
-    const animationBreakpoints = [2/3]; 
+    const animationBreakpoints = [3/4]; 
 
     // ** Breakpoints for morphing **
-    const breakpoints = [0, 1/48, 15/48, 17/48, 32/48]; 
+    const breakpoints = [0, 1/96, 23/96, 25/96, 48/96, 1]; 
 
     const visibleSVG = document.getElementById("hero-svg");
     const visibleLines = [];
@@ -149,9 +149,9 @@ Promise.all(uniqueSvgFiles.map(loadSVG)).then((svgDocs) => {
         previousSegment = segmentIndex;
     }
 
-    // Animation
+    // Animation, the full height (multiple of viewport heights) to control the animation
     function update() {
-        const progress = Math.min(1, window.scrollY / (3 * window.innerHeight));
+        const progress = Math.min(1, window.scrollY / (4 * window.innerHeight));
         updateLines(progress);
         requestAnimationFrame(update);
     }
