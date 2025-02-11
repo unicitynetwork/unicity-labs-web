@@ -1,4 +1,4 @@
-<h1>Unicity Network Website</h1>   
+<h1>Unicity Labs Website</h1>   
 
 A landing page built with Tailwindcss and the [Tailus Ada template](https://ui.tailus.io/templates/ada/).
 
