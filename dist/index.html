@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Unicity Labs</title>
         <meta name="description" content="Off-chain crypto agents" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" media="(prefers-color-scheme: light)" />
-        <link rel="icon" type="image/svg+xml" href="/darkfavicon.svg" media="(prefers-color-scheme: dark)" />
+        <link rel="icon" type="image/svg+xml" href="./favicon.svg" media="(prefers-color-scheme: light)" />
+        <link rel="icon" type="image/svg+xml" href="./darkfavicon.svg" media="(prefers-color-scheme: dark)" />
 
         <!-- Facebook Meta Tags -->
         <meta property="og:url" content="https://unicity-labs.com/" />
@@ -22,6 +22,8 @@
         <meta name="twitter:title" content="Unicity Labs" />
         <meta name="twitter:description" content="Off-chain crypto agents" />
         <meta name="twitter:image" content="/og-cover.png" />
+      <script type="module" crossorigin src="./assets/index-Dy_WyK9m.js"></script>
+      <link rel="stylesheet" crossorigin href="./assets/index-CU3kJwjf.css">
     </head>
     
     <body class="bg-gray-900">
@@ -295,34 +297,5 @@ docker-compose up -d
     </main>
 
     <script src="hero.js"></script>        
-    <script type="module" src="./main.js"></script>
-    <script type="module">
-        import Swiper from 'swiper/bundle';
-        import { Pagination } from 'swiper/modules';
-        import 'swiper/css/bundle';
-        import 'swiper/css/pagination';
-        import 'swiper/css/effect-cards'
-
-        const swiper = new Swiper('.proofSlides', {
-            effect: "cube",
-            cubeEffect : {
-                slideShadows: false,
-                shadow: false,
-                shadowOffset: 20,
-                shadowScale: 0.94,
-            },
-            loop: true,
-            autoplay : {
-                delay: 3000,
-                duration : 500
-            },
-            grabCursor: true,
-            modules: [Pagination],
-            centeredSlides: true,
-            pagination: {
-                el: '.swiper-pagination',
-            }
-        });
-    </script>
     </body>
 </html>
